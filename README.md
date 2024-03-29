@@ -158,6 +158,36 @@ Dictionaries
     - 2nd list adds axis labels so 2 will show 2B
 - Annotations
     - plt.text(x,y,'text to insert') inserts text at the x,y coordinates
-    - 
-
-    
+## Time Series Analysis
+- Pandas
+  - from datetime import datetime - to manually create dates
+  - ****pd.timestamp****(2023-03-15)
+      - time will be midnight here 00:00:00
+      - timestamp.****year**** returns 2023
+      - timestamp.****day_name()**** Returns Wednesday
+      - time periods - ****pd.Period("2017-01")***** returns month end
+      - period.****asfreq('D')**** returns daily frequency
+      - pd.Timestamp('2017-01-31', 'M') +1
+          - date with Monthly frequency
+          - +1 will return end of month in February 2017
+      - Creating Time series
+          - ****index = pd.date_range(start, end, periods, freq)****
+               - index = pd.date_range(start='2017-01-01, periods=12, freq='M')
+               - defult is daily frequency
+               - can check using ****pd.DataFrame({'data':index}).info()****
+               - Frequencies: H-hour D-day W-week M-Month Q-quater Y-year B-Business days
+- Indexing and Resampling time series
+  - convert date string to datetime64
+      - ****pd.to_datetime(df['date'])****
+    - convert date into index
+      - ****df.set_index('date', inplace - True)****
+          - Inplace does not create copy
+  - Can then filter and slice
+      - df.['2023'] returns dates for 2023
+      - df['2023-3':'2023-6'] slices data in that date range (inclusive of last date)
+      - df.loc['2023-3-15', 'price'] returns price on that date
+  - Set frequency
+      - ****df.asfreq('M')****
+      - Upsampling - higher granularity returns more dates showing missing data
+          - ****df[df.'price'.isnull()]**** returns missing prices
+        - 
