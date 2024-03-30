@@ -176,18 +176,57 @@ Dictionaries
                - defult is daily frequency
                - can check using ****pd.DataFrame({'data':index}).info()****
                - Frequencies: H-hour D-day W-week M-Month Q-quater Y-year B-Business days
-- Indexing and Resampling time series
+#### Indexing and Resampling time series
   - convert date string to datetime64
       - ****pd.to_datetime(df['date'])****
     - convert date into index
       - ****df.set_index('date', inplace - True)****
           - Inplace does not create copy
+      - ****pd.read_csv('csv', parse_dates=['date'], idnex_col='date')****
   - Can then filter and slice
       - df.['2023'] returns dates for 2023
       - df['2023-3':'2023-6'] slices data in that date range (inclusive of last date)
       - df.loc['2023-3-15', 'price'] returns price on that date
   - Set frequency
       - ****df.asfreq('M')****
-      - Upsampling - higher granularity returns more dates showing missing data
-          - ****df[df.'price'.isnull()]**** returns missing prices
-        - 
+      - ****df[df.'price'.isnull()]**** returns missing prices
+#### Time Series Calculations
+    - df.shoft() moves time series to past or future
+        - lead - df.shift() moves shifted date 1 period
+        - lag - df.shift(periods = -1) shifts data back 1 period
+    - Finincial Return - calculate 1 period percent change
+          - df.price.div(df.shifted)
+              - divides price by the shifted price column
+    - Find relative change in percentage terms
+          - df.change.sub(1).mul(100)
+                - takes the change column subtracts 1 then gets percentage
+          - df.price.diff() difference in value for two periods
+          - ****df.column.pct_change(periods=n).mul(100)****
+#### Time Series Growth Rates
+- Since prices start at different levels normalize price series to start at 100
+   - Divide all prices by first in series then multiply by 100
+       - Provides same starting point
+       - All prices relevent to starting point
+       - Difference to starting point is in perentage points
+            ****first_price = df.price.iloc[0]
+            normalized = df.price.div(first_price).mul(100)
+            normalized.plot()****
+       - Comparing against a benchmark
+           ****index = pd.read_csv('benchmark_csv', parse_dates=['date'], index_col = 'date')
+           prices = pd.concat([prices, index], axis=1).dropna()
+           normalized = prices.div(prices.iloc[0]).mul(100)
+           normalized.plot()
+           diff = normalized[tickers].sub(normalized['SP500']),axis = 0)****
+#### Changing Frequency    
+- DateTImeIndex set using ****.asfreq()**** or ****.reindex()****
+- Frequency conversions affect data
+    - Upsampling: fill or interpolate missing data
+        - Upsampling has higher granularity which shows nulls
+        - In example of changing frequency from quarterly to monthly
+            ****monthly = monthly.to_frame('baseline')****
+              - converts series to DataFrame
+            - Fill methods
+                ****monthly['ffill'] = quarterly.asfreq('M', method='ffill')****
+                ****monthly['bfill'] = quarterly.asfreq('M', method='bfill')****
+               ****monthly['value']= quarterly.asfreq('M', fill_value=0)****
+    - Downsampling: reduce rows need to aggregate existing data
